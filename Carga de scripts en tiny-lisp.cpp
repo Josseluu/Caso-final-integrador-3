@@ -1,66 +1,38 @@
 #include <iostream>
-#include <string>
-#include <cstdio>
+#include <fstream>
 
-using namespace std;
+void load_script(const char* filename, bool show_script = false) {
+    std::ifstream file(filename);
 
-struct ColorConsole
-{
-    static constexpr auto fg_blue = "\033[34m";
-    static constexpr auto bg_white = "\033[47m";
-};
-
-struct ConsoleBox
-{
-    void new_text() {/*...*/}
-    void set_text(const string &text) { cout << text << endl; }
-};
-
-ConsoleBox *consoleBox = new ConsoleBox; // suponemos que ya está inicializado
-
-void load_script(const char* filename, bool show_script = false)
-{
-    string script;
-    FILE* f = nullptr;
-    try
-    {
-        f = fopen(filename, "rb");
-        if (!f)
-        {
-            cerr << "error de apertura de " << filename << endl;
-            return;
-        }
-
-        int c;
-        char buf[4001];
-        while ((c = fread(buf, 1, 4000, f)) > 0)
-        {
-            buf[c] = 0;
-            script.append(buf);
-        }
-        fclose(f);
-        f = nullptr;
-
-        if (show_script)
-        {
-            cout << ColorConsole::fg_blue << ColorConsole::bg_white;
-            cout << script << endl;
-        }
-        consoleBox->new_text();
-        consoleBox->set_text(script);
+    if (!file.is_open()) {
+        std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
+        return;
     }
-    catch (...)
-    {
-        cerr << "error durante la lectura del archivo" << endl;
-        if(f)
-            fclose(f);
+
+    if (show_script) {
+        std::string line;
+        while (std::getline(file, line)) {
+            std::cout << line << std::endl;
+        }
     }
+
+    file.close();
 }
 
-void load_script()
-{
-    char filename[500];
-    printf("Archivo: ");
-    scanf("%499s", filename);
-    load_script(filename, true);
+void load_script() {
+    std::string filename;
+    std::cout << "Ingrese el nombre del archivo: ";
+    std::cin >> filename;
+
+    load_script(filename.c_str(), true);
+}
+
+int main() {
+    // Uso de load_script() sin parámetros para ingresar el nombre del archivo
+    load_script();
+
+
+    load_script("nombre_del_archivo.txt", true);
+
+    return 0;
 }
